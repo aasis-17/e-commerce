@@ -1,19 +1,29 @@
-import express from "express";
-import connectionDB from "./connectDB/index.js";
+import app from "./src/app.js";
+import dotenv from "dotenv"
+import connectionDB from "./src/connectDB/index.js"
 
-const app = express()
-const PORT = 7000
-const URI = "mongodb://localhost:27017/e-commerce"
+dotenv.config({
+    path : "./.env"
+})
 
-
-//Middlewares
-app.use(express.urlencoded({extended : false}))
-app.use(express.json())
+const PORT = process.env.PORT || 8000
+const URI = process.env.MONGODB_URI 
 
 //Database connection
 connectionDB(URI)
+.then(() => {
+    app.listen(PORT , () => {
+        console.log(`**Server statrted at port ${PORT}**`)
+    } )
+
+    app.on("error", (error) => {
+        console.log("error", error)
+        throw error
+    })
+})
+.catch(error => {
+    console.log("Database connection failed!!", error)
+})
 
 
-app.listen(PORT, () => {
-    console.log(`**Server statrted at port ${PORT}**`)
-} )
+
